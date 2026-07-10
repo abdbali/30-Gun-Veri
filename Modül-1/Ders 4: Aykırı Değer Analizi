@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders 4: Aykırı Değer Analizi</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 py-6 px-8 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <span class="text-xs font-semibold text-blue-600 tracking-wider uppercase">Modül 1: Veri Okuryazarlığı • Ders 4</span>
+                <h1 class="text-2xl font-bold text-gray-900 mt-1">Aykırı Değer (Outlier) Tespiti ve Veri Budama</h1>
+            </div>
+            <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm border border-blue-100">
+                Temizlenen Kayıt: <span id="score" class="font-bold">0</span> / 6
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between gap-6">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Algoritma Mantığı</h2>
+                <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                    Veri setinde, genel dağılımın aşırı derecede dışında kalan verilere **aykırı değer (outlier)** denir. Örneğin bir şirketteki maaş ortalamasını hesaplarken, üst yönetimin çok yüksek maaşları veya sistemsel veri giriş hataları ortalamayı saptırır. Bu verilerin elenmesi (budama) gerekir.
+                </p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl space-y-3 mb-4">
+                    <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Kodlama Yol Haritası</h3>
+                    <p class="text-xs text-blue-800 leading-relaxed">
+                        Yandaki editörün içine sırayla şu mantığı kurmanız bekleniyor:
+                    </p>
+                    <ol class="text-xs text-blue-800 list-decimal list-inside space-y-2 font-medium">
+                        <li>Gelen personel nesnesinin maaş bilgisini kontrol edin. Şirketin üst sınır kuralı `150000` TL'dir.</li>
+                        <li>Eğer `personel.maas` değeri `150000` sayısından büyükse, bu veri aykırı değerdir. Bu durumda geriye `false` döndürerek veriyi eleyin.</li>
+                        <li>Maaş değeri bu sınıra eşit veya küçükse veri normaldir. Geriye `true` döndürerek veri setinde tutun.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">Kullanılacak Sözdizimi</h3>
+                    <pre class="text-[11px] font-mono text-amber-950 leading-relaxed">if (personel.maas > 150000) {
+    return false;
+}
+return true;</pre>
+                </div>
+            </div>
+
+            <div id="feedback" class="p-4 rounded-xl text-sm font-medium text-center hidden"></div>
+        </div>
+
+        <div class="lg:col-span-5 bg-gray-900 rounded-2xl border border-gray-800 shadow-lg flex flex-col overflow-hidden min-h-[500px]">
+            <div class="bg-gray-950 px-4 py-3 border-b border-gray-800 flex justify-between items-center">
+                <span class="text-xs font-semibold text-gray-400 font-mono">outlier_detector.js</span>
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            </div>
+            
+            <div class="flex-1 p-4 font-mono text-xs text-gray-300 flex flex-col bg-gray-950">
+                <div class="text-gray-500 mb-2">// Fonksiyon icerisine aykiri deger filtreleme kodunuzu yazin.</div>
+                <div class="text-blue-400 font-semibold text-sm">function <span class="text-green-400">aykiriDegerFiltrele</span>(personel) {</div>
+                
+                <textarea id="code-input" class="w-full flex-1 bg-gray-900/40 border border-gray-800 focus:border-blue-500 text-green-400 p-4 font-mono text-xs rounded-lg focus:outline-hidden resize-none my-2 leading-loose tracking-wide" spellcheck="false" placeholder="// 1. Adimdan baslayarak kodunuzu buraya yazin..."></textarea>
+                
+                <div class="text-blue-400 font-semibold text-sm">}</div>
+            </div>
+
+            <div class="p-4 bg-gray-950 border-t border-gray-800 flex gap-3">
+                <button id="help-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium text-xs px-4 py-3 rounded-xl transition cursor-pointer">
+                    İpucu Ekle
+                </button>
+                <button id="run-code-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-5 py-3 rounded-xl transition cursor-pointer text-center font-bold uppercase tracking-wider">
+                    Derle ve Testleri Başlat
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            
+            <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Test Edilecek Ham Veri Seti</h3>
+                <div class="space-y-1 font-mono text-[10px] text-gray-600 max-h-[180px] overflow-y-auto">
+                    <div class="p-1 bg-gray-50 rounded">P01 (Analist): 55000 TL</div>
+                    <div class="p-1 bg-gray-50 rounded">P02 (Stajyer): 18000 TL</div>
+                    <div class="p-1 bg-gray-50 rounded">P03 (CEO): 420000 TL</div>
+                    <div class="p-1 bg-gray-50 rounded">P04 (Müdür): 95000 TL</div>
+                    <div class="p-1 bg-gray-50 rounded">P05 (Hatalı Giriş): 850000 TL</div>
+                    <div class="p-1 bg-gray-50 rounded">P06 (Uzman): 68000 TL</div>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-white border border-gray-200 p-4 rounded-2xl flex flex-col shadow-2xs">
+                <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">Veri Ambarı Konsolu</h3>
+                <div id="console-list" class="flex-1 overflow-y-auto space-y-1.5 text-[11px] font-mono text-gray-500">
+                    <div class="italic text-gray-400">Algoritma henüz çalıştırılmadı. Test sonuçları burada listelenecek.</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        Veri ve Yapay Zeka Simülasyon Serisi • Ders 4
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeInput = document.getElementById('code-input');
+            const runBtn = document.getElementById('run-code-btn');
+            const helpBtn = document.getElementById('help-btn');
+            const consoleList = document.getElementById('console-list');
+            const feedback = document.getElementById('feedback');
+            const scoreDisplay = document.getElementById('score');
+
+            // Test personelleri (CEO ve Hatalı Giriş veri budamasına takılmalı)
+            const testData = [
+                { id: "P01", unvan: "Analist", maas: 55000, beklenenSonuc: true },
+                { id: "P02", unvan: "Stajyer", maas: 18000, beklenenSonuc: true },
+                { id: "P03", unvan: "CEO", maas: 420000, beklenenSonuc: false }, // Aykırı Değer
+                { id: "P04", unvan: "Müdür", maas: 95000, beklenenSonuc: true },
+                { id: "P05", unvan: "Hatalı Giriş", maas: 850000, beklenenSonuc: false }, // Aykırı Değer
+                { id: "P06", unvan: "Uzman", maas: 68000, beklenenSonuc: true }
+            ];
+
+            helpBtn.addEventListener('click', () => {
+                codeInput.value = `if (personel.maas > 150000) {\n    return false;\n} else {\n    return true;\n}`;
+            });
+
+            runBtn.addEventListener('click', () => {
+                consoleList.innerHTML = "";
+                let correctCount = 0;
+                const userCode = codeInput.value.trim();
+
+                if (!userCode) {
+                    showFeedback("Lütfen önce editör alanına kodunuzu yazın.", "error");
+                    return;
+                }
+
+                try {
+                    const userFunction = new Function('personel', userCode);
+
+                    testData.forEach(item => {
+                        const userResult = userFunction({ unvan: item.unvan, maas: item.maas });
+                        
+                        const logLine = document.createElement('div');
+                        logLine.className = "p-1.5 rounded text-[11px] border";
+
+                        if (userResult === item.beklenenSonuc) {
+                            correctCount++;
+                            logLine.classList.add("bg-green-50", "border-green-100", "text-green-800");
+                            const aksiyon = userResult ? "Veri Saklandi" : "Aykiri Deger Elendi";
+                            logLine.innerHTML = `[OK] <strong>${item.id}</strong> -> ${aksiyon}`;
+                        } else {
+                            logLine.classList.add("bg-red-50", "border-red-100", "text-red-800");
+                            logLine.innerHTML = `[HATA] <strong>${item.id}</strong> -> Maas: ${item.maas} TL, Donen Karar: ${userResult}`;
+                        }
+                        consoleList.appendChild(logLine);
+                    });
+
+                    scoreDisplay.innerText = correctCount;
+
+                    if (correctCount === 6) {
+                        showFeedback("Harika! Aykırı değerleri doğru filtreleyerek istatistiksel sapmaları engellediniz. Veri kümesi temizlendi.", "success");
+                    } else {
+                        showFeedback(`Kod çalıştı ancak bazı aykırı değerler veri tabanına sızdı. Başarı: ${correctCount}/6. 150000 TL üst sınır kuralını gözden geçirin.`, "error");
+                    }
+
+                } catch (error) {
+                    showFeedback(`Sözdizimi Hatası: Yazılan kod derlenemedi. Küme parantezlerini ve mantıksal operatörleri kontrol edin.`, "syntax");
+                    
+                    const errorLine = document.createElement('div');
+                    errorLine.className = "p-2 bg-red-900 text-red-200 text-[10px] rounded font-mono";
+                    errorLine.innerText = `[HATA KONSOLU]: ${error.message}`;
+                    consoleList.appendChild(errorLine);
+                }
+            });
+
+            function showFeedback(message, type) {
+                feedback.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-amber-100', 'text-amber-800', 'bg-red-100', 'text-red-800');
+                feedback.innerText = message;
+                
+                if (type === 'success') {
+                    feedback.classList.add('bg-green-100', 'text-green-800');
+                } else if (type === 'error') {
+                    feedback.classList.add('bg-amber-100', 'text-amber-800');
+                } else {
+                    feedback.classList.add('bg-red-100', 'text-red-800');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
