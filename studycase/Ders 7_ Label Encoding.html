@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders 7: Label Encoding</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 py-6 px-8 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <span class="text-xs font-semibold text-blue-600 tracking-wider uppercase">Modül 1: Veri Okuryazarlığı • Ders 7</span>
+                <h1 class="text-2xl font-bold text-gray-900 mt-1">Sıralı Kategorik Veriler ve Label Encoding</h1>
+            </div>
+            <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm border border-blue-100">
+                Doğru Dönüşüm: <span id="score" class="font-bold">0</span> / 6
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between gap-6">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Algoritma Mantığı</h2>
+                <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                    Kategorik veriler kendi aralarında bir hiyerarşi veya sıra belirtiyorsa (Örn: Eğitim durumu, memnuniyet seviyesi), One-Hot Encoding yerine **Label Encoding** tercih edilir. Bu yöntemde her benzersiz metin etiketine, aralarındaki derece ilişkisini bozmayacak şekilde benzersiz bir tam sayı atanır.
+                </p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl space-y-3 mb-4">
+                    <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Kodlama Yol Haritası</h3>
+                    <p class="text-xs text-blue-800 leading-relaxed">
+                        Yandaki editörün içine sırayla şu mantığı kurmanız bekleniyor:
+                    </p>
+                    <ol class="text-xs text-blue-800 list-decimal list-inside space-y-2 font-medium">
+                        <li>Gelen `seviye` parametresini kontrol edin.</li>
+                        <li>Eğer seviye `"dusuk"` ise, hiyerarşinin en alt basamağı olarak geriye `0` sayısını döndürün.</li>
+                        <li>Eğer seviye `"orta"` ise geriye `1` sayısını, `"yuksek"` ise en üst basamak olarak `2` sayısını döndürün.</li>
+                        <li>Bu üç tanımlı etiket dışında bir metin gelirse, belirsizliği temsil etmek adına geriye `-1` döndürün.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">Kullanılacak Sözdizimi</h3>
+                    <pre class="text-[11px] font-mono text-amber-950 leading-relaxed">if (seviye === "dusuk") {
+    return 0;
+} else if (seviye === "orta") {
+    // kodunuz...
+}</pre>
+                </div>
+            </div>
+
+            <div id="feedback" class="p-4 rounded-xl text-sm font-medium text-center hidden"></div>
+        </div>
+
+        <div class="lg:col-span-5 bg-gray-900 rounded-2xl border border-gray-800 shadow-lg flex flex-col overflow-hidden min-h-[500px]">
+            <div class="bg-gray-950 px-4 py-3 border-b border-gray-800 flex justify-between items-center">
+                <span class="text-xs font-semibold text-gray-400 font-mono">label_encoder.js</span>
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            </div>
+            
+            <div class="flex-1 p-4 font-mono text-xs text-gray-300 flex flex-col bg-gray-950">
+                <div class="text-gray-500 mb-2">// Fonksiyon icerisine etiket esleme kodlarinizi yazin.</div>
+                <div class="text-blue-400 font-semibold text-sm">function <span class="text-green-400">etiketKodla</span>(seviye) {</div>
+                
+                <textarea id="code-input" class="w-full flex-1 bg-gray-900/40 border border-gray-800 focus:border-blue-500 text-green-400 p-4 font-mono text-xs rounded-lg focus:outline-hidden resize-none my-2 leading-loose tracking-wide" spellcheck="false" placeholder="// 1. Adimdan baslayarak kodunuzu buraya yazin..."></textarea>
+                
+                <div class="text-blue-400 font-semibold text-sm">}</div>
+            </div>
+
+            <div class="p-4 bg-gray-950 border-t border-gray-800 flex gap-3">
+                <button id="help-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium text-xs px-4 py-3 rounded-xl transition cursor-pointer">
+                    İpucu Ekle
+                </button>
+                <button id="run-code-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-5 py-3 rounded-xl transition cursor-pointer text-center font-bold uppercase tracking-wider">
+                    Derle ve Testleri Başlat
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            
+            <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Test Edilecek Etiketler</h3>
+                <div class="space-y-1 font-mono text-[10px] text-gray-600 max-h-[180px] overflow-y-auto">
+                    <div class="p-1 bg-gray-50 rounded">Anket 1: "orta"</div>
+                    <div class="p-1 bg-gray-50 rounded">Anket 2: "yuksek"</div>
+                    <div class="p-1 bg-gray-50 rounded">Anket 3: "dusuk"</div>
+                    <div class="p-1 bg-gray-50 rounded">Anket 4: "yuksek"</div>
+                    <div class="p-1 bg-gray-50 rounded">Anket 5: "belirtilmemis"</div>
+                    <div class="p-1 bg-gray-50 rounded">Anket 6: "dusuk"</div>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-white border border-gray-200 p-4 rounded-2xl flex flex-col shadow-2xs">
+                <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">Veri Ambarı Konsolu</h3>
+                <div id="console-list" class="flex-1 overflow-y-auto space-y-1.5 text-[11px] font-mono text-gray-500">
+                    <div class="italic text-gray-400">Algoritma henüz çalıştırılmadı. Test sonuçları burada listelenecek.</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        Veri ve Yapay Zeka Simülasyon Serisi • Ders 7
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeInput = document.getElementById('code-input');
+            const runBtn = document.getElementById('run-code-btn');
+            const helpBtn = document.getElementById('help-btn');
+            const consoleList = document.getElementById('console-list');
+            const feedback = document.getElementById('feedback');
+            const scoreDisplay = document.getElementById('score');
+
+            const testData = [
+                { ham: "orta", beklenen: 1 },
+                { ham: "yuksek", beklenen: 2 },
+                { ham: "dusuk", beklenen: 0 },
+                { ham: "yuksek", beklenen: 2 },
+                { ham: "belirtilmemis", beklenen: -1 }, // Sınır testi (Tanımsız etiket senaryosu)
+                { ham: "dusuk", beklenen: 0 }
+            ];
+
+            helpBtn.addEventListener('click', () => {
+                codeInput.value = `if (seviye === "dusuk") {\n    return 0;\n} else if (seviye === "orta") {\n    return 1;\n} else if (seviye === "yuksek") {\n    return 2;\n} else {\n    return -1;\n}`;
+            });
+
+            runBtn.addEventListener('click', () => {
+                consoleList.innerHTML = "";
+                let correctCount = 0;
+                const userCode = codeInput.value.trim();
+
+                if (!userCode) {
+                    showFeedback("Lütfen önce editör alanına kodunuzu yazın.", "error");
+                    return;
+                }
+
+                try {
+                    const userFunction = new Function('seviye', userCode);
+
+                    testData.forEach((item, index) => {
+                        const userResult = userFunction(item.ham);
+                        
+                        const logLine = document.createElement('div');
+                        logLine.className = "p-1.5 rounded text-[11px] border";
+
+                        if (userResult === item.beklenen) {
+                            correctCount++;
+                            logLine.classList.add("bg-green-50", "border-green-100", "text-green-800");
+                            logLine.innerHTML = `[OK] Veri ${index+1}: "${item.ham}" -> Kodlanmis Sayi: ${userResult}`;
+                        } else {
+                            logLine.classList.add("bg-red-50", "border-red-100", "text-red-800");
+                            logLine.innerHTML = `[HATA] Veri ${index+1}: "${item.ham}" -> Beklenen: ${item.beklenen}, Donen: ${userResult}`;
+                        }
+                        consoleList.appendChild(logLine);
+                    });
+
+                    scoreDisplay.innerText = correctCount;
+
+                    if (correctCount === 6) {
+                        showFeedback("Harika! Sıralı kategorik özellikleri sayısal indekslere (Label Encoding) kayıpsız dönüştürdünüz.", "success");
+                    } else {
+                        showFeedback(`Kod çalıştı ancak bazı dönüşümler hatalı gerçekleşti. Başarı: ${correctCount}/6. Tanımlanmamış girdiler için -1 döndürmeyi unutmayın.`, "error");
+                    }
+
+                } catch (error) {
+                    showFeedback(`Sözdizimi Hatası: Koşullu dallanma ifadelerinizi veya karşılaştırma operatörlerini kontrol edin.`, "syntax");
+                    
+                    const errorLine = document.createElement('div');
+                    errorLine.className = "p-2 bg-red-900 text-red-200 text-[10px] rounded font-mono";
+                    errorLine.innerText = `[HATA KONSOLU]: ${error.message}`;
+                    consoleList.appendChild(errorLine);
+                }
+            });
+
+            function showFeedback(message, type) {
+                feedback.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-amber-100', 'text-amber-800', 'bg-red-100', 'text-red-800');
+                feedback.innerText = message;
+                
+                if (type === 'success') {
+                    feedback.classList.add('bg-green-100', 'text-green-800');
+                } else if (type === 'error') {
+                    feedback.classList.add('bg-amber-100', 'text-amber-800');
+                } else {
+                    feedback.classList.add('bg-red-100', 'text-red-800');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
