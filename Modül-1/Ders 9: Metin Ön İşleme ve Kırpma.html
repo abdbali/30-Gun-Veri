@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders 9: Metin Ön İşleme ve Kırpma</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 py-6 px-8 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <span class="text-xs font-semibold text-blue-600 tracking-wider uppercase">Modül 1: Veri Okuryazarlığı • Ders 9</span>
+                <h1 class="text-2xl font-bold text-gray-900 mt-1">NLP Ön İşleme: Metin Temizliği ve Karakter Sınırlandırma</h1>
+            </div>
+            <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm border border-blue-100">
+                Temizlenen Metin: <span id="score" class="font-bold">0</span> / 6
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between gap-6">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Algoritma Mantığı</h2>
+                <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                    Doğal Dil İşleme (NLP) modellerine ham metinler gönderilmeden önce tokenizasyon maliyetlerini düşürmek ve bellek hatalarını önlemek için metinler standartlaştırılmalıdır. Kullanıcıların metin başlarına veya sonlarına yanlışlıkla bıraktığı boşluklar temizlenmeli, modelin desteklediği maksimum karakter sınırı aşılıyorsa metin güvenli bir şekilde kesilmelidir.
+                </p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl space-y-3 mb-4">
+                    <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wider">Kodlama Yol Haritası</h3>
+                    <p class="text-xs text-blue-800 leading-relaxed">
+                        Yandaki editörün içine sırayla şu mantığı kurmanız bekleniyor:
+                    </p>
+                    <ol class="text-xs text-blue-800 list-decimal list-inside space-y-2 font-medium">
+                        <li>Gelen ham `metin` parametresinin başındaki ve sonundaki gereksiz boşlukları temizlemek için JavaScript `.trim()` metodunu uygulayın ve sonucu bir değişkene atayın.</li>
+                        <li>Eğer temizlenmiş metnin karakter uzunluğu (`.length`) `20` karakterden büyükse, metni sadece ilk 20 karakteri kalacak şekilde `.substring(0, 20)` metodu ile kesin.</li>
+                        <li>Karakter uzunluğu 20 veya daha az ise metne müdahale etmeyin.</li>
+                        <li>Son aşamada elde ettiğiniz temizlenmiş ve sınırlandırılmış nihai metni geriye `return` edin.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">Kullanılacak Metotlar</h3>
+                    <pre class="text-[11px] font-mono text-amber-950 leading-relaxed">let temiz = metin.trim();
+if (temiz.length > 20) {
+    return temiz.substring(0, 20);
+}
+return temiz;</pre>
+                </div>
+            </div>
+
+            <div id="feedback" class="p-4 rounded-xl text-sm font-medium text-center hidden"></div>
+        </div>
+
+        <div class="lg:col-span-5 bg-gray-900 rounded-2xl border border-gray-800 shadow-lg flex flex-col overflow-hidden min-h-[500px]">
+            <div class="bg-gray-950 px-4 py-3 border-b border-gray-800 flex justify-between items-center">
+                <span class="text-xs font-semibold text-gray-400 font-mono">text_processor.js</span>
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            </div>
+            
+            <div class="flex-1 p-4 font-mono text-xs text-gray-300 flex flex-col bg-gray-950">
+                <div class="text-gray-500 mb-2">// Fonksiyon icerisine metin on isleme kodlarinizi yazin.</div>
+                <div class="text-blue-400 font-semibold text-sm">function <span class="text-green-400">metniOnIsle</span>(metin) {</div>
+                
+                <textarea id="code-input" class="w-full flex-1 bg-gray-900/40 border border-gray-800 focus:border-blue-500 text-green-400 p-4 font-mono text-xs rounded-lg focus:outline-hidden resize-none my-2 leading-loose tracking-wide" spellcheck="false" placeholder="// 1. Adimdan baslayarak kodunuzu buraya yazin..."></textarea>
+                
+                <div class="text-blue-400 font-semibold text-sm">}</div>
+            </div>
+
+            <div class="p-4 bg-gray-950 border-t border-gray-800 flex gap-3">
+                <button id="help-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium text-xs px-4 py-3 rounded-xl transition cursor-pointer">
+                    İpucu Ekle
+                </button>
+                <button id="run-code-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-5 py-3 rounded-xl transition cursor-pointer text-center font-bold uppercase tracking-wider">
+                    Derle ve Testleri Başlat
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            
+            <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Test Edilecek Ham Veriler</h3>
+                <div class="space-y-1 font-mono text-[10px] text-gray-600 max-h-[180px] overflow-y-auto">
+                    <div class="p-1 bg-gray-50 rounded">M1: "  Yapay Zeka  "</div>
+                    <div class="p-1 bg-gray-50 rounded">M2: "Derin Ogrenme Modelleri ve Analizi"</div>
+                    <div class="p-1 bg-gray-50 rounded">M3: "Veri Bilimi"</div>
+                    <div class="p-1 bg-gray-50 rounded">M4: "   NLP Teknolojileri Gelecektir   "</div>
+                    <div class="p-1 bg-gray-50 rounded">M5: "Kisa"</div>
+                    <div class="p-1 bg-gray-50 rounded">M6: "Tam Yirmi Karakterdir"</div>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-white border border-gray-200 p-4 rounded-2xl flex flex-col shadow-2xs">
+                <h3 class="font-bold text-gray-800 text-xs uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">Veri Ambarı Konsolu</h3>
+                <div id="console-list" class="flex-1 overflow-y-auto space-y-1.5 text-[11px] font-mono text-gray-500">
+                    <div class="italic text-gray-400">Algoritma henüz çalıştırılmadı. Test sonuçları burada listelenecek.</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        Veri ve Yapay Zeka Simülasyon Serisi • Ders 9
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeInput = document.getElementById('code-input');
+            const runBtn = document.getElementById('run-code-btn');
+            const helpBtn = document.getElementById('help-btn');
+            const consoleList = document.getElementById('console-list');
+            const feedback = document.getElementById('feedback');
+            const scoreDisplay = document.getElementById('score');
+
+            const testData = [
+                { ham: "  Yapay Zeka  ", beklenen: "Yapay Zeka" },
+                { ham: "Derin Ogrenme Modelleri ve Analizi", beklenen: "Derin Ogrenme Modelle" }, // 20 karaktere budandı
+                { ham: "Veri Bilimi", beklenen: "Veri Bilimi" },
+                { ham: "   NLP Teknolojileri Gelecektir   ", beklenen: "NLP Teknolojileri Ge" }, // Boşluk temizlendi + budandı
+                { ham: "Kisa", beklenen: "Kisa" },
+                { ham: "Tam Yirmi Karakterdir", beklenen: "Tam Yirmi Karakterdir" } // Tam 20 karakter sınır testi
+            ];
+
+            helpBtn.addEventListener('click', () => {
+                codeInput.value = `let temizlenmis = metin.trim();\nif (temizlenmis.length > 20) {\n    return temizlenmis.substring(0, 20);\n}\nreturn temizlenmis;`;
+            });
+
+            runBtn.addEventListener('click', () => {
+                consoleList.innerHTML = "";
+                let correctCount = 0;
+                const userCode = codeInput.value.trim();
+
+                if (!userCode) {
+                    showFeedback("Lütfen önce editör alanına kodunuzu yazın.", "error");
+                    return;
+                }
+
+                try {
+                    const userFunction = new Function('metin', userCode);
+
+                    testData.forEach((item, index) => {
+                        const userResult = userFunction(item.ham);
+                        
+                        const logLine = document.createElement('div');
+                        logLine.className = "p-1.5 rounded text-[11px] border";
+
+                        if (userResult === item.beklenen) {
+                            correctCount++;
+                            logLine.classList.add("bg-green-50", "border-green-100", "text-green-800");
+                            logLine.innerHTML = `[OK] M${index+1} -> Cikti: "${userResult}" (Uzunluk: ${userResult.length})`;
+                        } else {
+                            logLine.classList.add("bg-red-50", "border-red-100", "text-red-800");
+                            logLine.innerHTML = `[HATA] M${index+1} -> Beklenen: "${item.beklenen}", Donen: "${userResult || 'Bos'}"`;
+                        }
+                        consoleList.appendChild(logLine);
+                    });
+
+                    scoreDisplay.innerText = correctCount;
+
+                    if (correctCount === 6) {
+                        showFeedback("Harika! Metin ön işleme algoritmanız başarıyla çalıştı. Veriler tokenizasyon mimarisine gitmeye hazır.", "success");
+                    } else {
+                        showFeedback(`Kod çalıştı ancak metin temizleme çıktılarında hatalar var. Başarı: ${correctCount}/6. Önce boşlukları temizleyip ardından uzunluk kontrolü yaptığınızdan emin olun.`, "error");
+                    }
+
+                } catch (error) {
+                    showFeedback(`Sözdizimi Hatası: String metotlarının yazımını veya koşul yapılarını kontrol edin.`, "syntax");
+                    
+                    const errorLine = document.createElement('div');
+                    errorLine.className = "p-2 bg-red-900 text-red-200 text-[10px] rounded font-mono";
+                    errorLine.innerText = `[HATA KONSOLU]: ${error.message}`;
+                    consoleList.appendChild(errorLine);
+                }
+            });
+
+            function showFeedback(message, type) {
+                feedback.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-amber-100', 'text-amber-800', 'bg-red-100', 'text-red-800');
+                feedback.innerText = message;
+                
+                if (type === 'success') {
+                    feedback.classList.add('bg-green-100', 'text-green-800');
+                } else if (type === 'error') {
+                    feedback.classList.add('bg-amber-100', 'text-amber-800');
+                } else {
+                    feedback.classList.add('bg-red-100', 'text-red-800');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
