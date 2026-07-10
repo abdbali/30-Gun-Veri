@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ders 3: Veri Temizleme Simülasyonu</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+<header class="bg-white border-b border-gray-200 py-6 px-8 shadow-xs">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <span class="text-xs font-semibold text-blue-600 tracking-wider uppercase">Modül 1: Veri Okuryazarlığı</span>
+      <h1 class="text-2xl font-bold text-gray-900 mt-1">Ders 3: Veri Temizleme (Eksik Veri Yönetimi)</h1>
+    </div>
+    <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm border border-blue-100">
+      Ortalama Sepet Tutarı: <span id="avg-display" class="font-bold">Hesaplanıyor...</span>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 max-w-6xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-3">Gerçek İş Senaryosu</h2>
+      <p class="text-gray-600 text-sm leading-relaxed mb-4">
+        Pazarlama departmanı, son reklam kampanyasının verimliliğini ölçmek istiyor. Ancak web sitesindeki bir yazılım hatası yüzünden bazı kullanıcıların "Sepet Tutarı" verisi veritabanına **NULL (Eksik Veri)** olarak kaydedilmiş. Bu eksik veriler istatistiksel raporları ve yapay zeka modellerini yanıltır.
+      </p>
+
+      <div class="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-xl mb-4">
+        <h3 class="text-sm font-semibold text-amber-900 mb-1">Strateji Notu</h3>
+        <p class="text-xs text-amber-800 leading-relaxed mb-2">
+          Eksik verilerle baş etmek için yaygın iki strateji vardır:
+        </p>
+        <ul class="text-xs text-amber-800 space-y-1 list-disc list-inside">
+          <li><strong>Satırları Silmek:</strong> Eğer veri setiniz çok büyükse eksik satırlar gözden çıkarılabilir.</li>
+          <li><strong>İmputasyon (Doldurma):</strong> Eksik alanları mantıklı bir değerle (örneğin mevcut verilerin ortalamasıyla) doldurarak veri kaybı önlenir.</li>
+        </ul>
+      </div>
+
+      <h3 class="text-sm font-semibold text-gray-900 mb-2">Görevin:</h3>
+      <p class="text-gray-600 text-sm leading-relaxed mb-4">
+        Sağdaki tabloda kırmızı ile vurgulanmış hatalı (NULL) alanları inceleyin. Aşağıdaki butonları kullanarak veri setini yapay zekaya uygun hale getirin ve ortalama sepet tutarının nasıl değiştiğini gözlemleyin.
+      </p>
+    </div>
+
+    <div class="space-y-3">
+      <button id="clean-drop-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium text-sm px-5 py-3 rounded-xl transition shadow-xs cursor-pointer text-center">
+        Eksik Satırları Sil (Drop)
+      </button>
+      <button id="clean-fill-btn" class="w-full bg-gray-800 hover:bg-gray-950 text-white font-medium text-sm px-5 py-3 rounded-xl transition shadow-xs cursor-pointer text-center">
+        Eksik Alanları Ortalama ile Doldur (Impute)
+      </button>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2 flex flex-col gap-6">
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs flex-1 flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Müşteri Alışveriş Veri Seti</h3>
+        <span id="data-count" class="text-xs text-gray-500 font-medium">Toplam Satır: 6</span>
+      </div>
+
+      <div class="flex-1 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+          <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Müşteri ID</th>
+            <th class="px-4 py-3 font-semibold">Yaş</th>
+            <th class="px-4 py-3 font-semibold">Cihaz</th>
+            <th class="px-4 py-3 font-semibold">Sepet Tutarı</th>
+          </tr>
+          </thead>
+          <tbody id="dataset-body" class="divide-y divide-gray-200 text-gray-700">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="log-box" class="mt-4 p-3 bg-gray-900 rounded-xl text-xs font-mono text-gray-400 hidden">
+        // İşlem logları burada görünecek...
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+  Veri ve Yapay Zeka Simülasyon Serisi • Ders 3
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const datasetBody = document.getElementById('dataset-body');
+    const avgDisplay = document.getElementById('avg-display');
+    const dataCount = document.getElementById('data-count');
+    const logBox = document.getElementById('log-box');
+
+    const dropBtn = document.getElementById('clean-drop-btn');
+    const fillBtn = document.getElementById('clean-fill-btn');
+
+    // Başlangıç Ham Veri Seti
+    let currentData = [
+      { id: "M101", yas: 24, cihaz: "Mobil", tutar: 450 },
+      { id: "M102", yas: 35, cihaz: "Masaüstü", tutar: null }, // Eksik
+      { id: "M103", yas: 19, cihaz: "Mobil", tutar: 300 },
+      { id: "M104", yas: 42, cihaz: "Masaüstü", tutar: 850 },
+      { id: "M105", yas: 28, cihaz: "Mobil", tutar: null }, // Eksik
+      { id: "M106", yas: 31, cihaz: "Tablet", tutar: 600 }
+    ];
+
+    // Tabloyu Arayüze Çizen Fonksiyon
+    function renderTable(data) {
+      datasetBody.innerHTML = "";
+      data.forEach(item => {
+        const row = document.createElement('tr');
+
+        let tutarHucre = "";
+        if (item.tutar === null) {
+          tutarHucre = `<td class="px-4 py-3 bg-red-50 text-red-700 font-semibold italic">NULL (Eksik)</td>`;
+        } else if (item.isImputed) {
+          tutarHucre = `<td class="px-4 py-3 bg-green-50 text-green-700 font-bold">${item.tutar} TL (Dolduruldu)</td>`;
+        } else {
+          tutarHucre = `<td class="px-4 py-3 font-medium text-gray-900">${item.tutar} TL</td>`;
+        }
+
+        row.innerHTML = `
+                        <td class="px-4 py-3 font-mono">${item.id}</td>
+                        <td class="px-4 py-3">${item.yas}</td>
+                        <td class="px-4 py-3">${item.cihaz}</td>
+                        ${tutarHucre}
+                    `;
+        datasetBody.appendChild(row);
+      });
+
+      dataCount.innerText = `Toplam Satır: ${data.length}`;
+      calculateMetrics(data);
+    }
+
+    // İstatistiği (Ortalama) Hesaplayan Fonksiyon
+    function calculateMetrics(data) {
+      const validTutars = data.filter(item => item.tutar !== null).map(item => item.tutar);
+      if (validTutars.length === 0) {
+        avgDisplay.innerText = "0 TL";
+        return;
+      }
+      const sum = validTutars.reduce((a, b) => a + b, 0);
+      const avg = (sum / validTutars.length).toFixed(2);
+      avgDisplay.innerText = `${avg} TL`;
+      return parseFloat(avg);
+    }
+
+    // Aksiyon 1: Eksik Satırları Silme (Drop)
+    dropBtn.addEventListener('click', () => {
+      const filteredData = currentData.filter(item => item.tutar !== null);
+      renderTable(filteredData);
+
+      logBox.classList.remove('hidden');
+      logBox.innerText = `[LOG]: Veri temizleme islemi basariyla tamamlandi. Eksik veri iceren 2 satir silindi. Yeni veri boyutu: ${filteredData.length}`;
+
+      // Butonları kilitle
+      disableActionButtons();
+    });
+
+    // Aksiyon 2: Ortalama ile Doldurma (Imputation)
+    fillBtn.addEventListener('click', () => {
+      // Mevcut geçerli olanların ortalamasını al
+      const currentAvg = calculateMetrics(currentData);
+
+      const imputedData = currentData.map(item => {
+        if (item.tutar === null) {
+          return { ...item, tutar: Math.round(currentAvg), isImputed: true };
+        }
+        return item;
+      });
+
+      renderTable(imputedData);
+
+      logBox.classList.remove('hidden');
+      logBox.innerText = `[LOG]: Eksik veri alanlari mevcut verilerin ortalamasi olan ${Math.round(currentAvg)} TL ile dolduruldu. Veri kaybi yasanmadi.`;
+
+      disableActionButtons();
+    });
+
+    function disableActionButtons() {
+      dropBtn.setAttribute('disabled', 'true');
+      dropBtn.className = "w-full bg-gray-200 text-gray-400 font-medium text-sm px-5 py-3 rounded-xl text-center cursor-not-allowed";
+      fillBtn.setAttribute('disabled', 'true');
+      fillBtn.className = "w-full bg-gray-200 text-gray-400 font-medium text-sm px-5 py-3 rounded-xl text-center cursor-not-allowed";
+    }
+
+    // Sayfa ilk yüklendiğinde tabloyu bas
+    renderTable(currentData);
+  });
+</script>
+</body>
+</html>
